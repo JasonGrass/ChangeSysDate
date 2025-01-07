@@ -19,7 +19,7 @@ namespace ChangeSysTimeFrmApp
         /// <summary>
         /// 计时器触发间隔时间，毫秒
         /// </summary>
-        public static int TriggerTimeSpan = 20;
+        public static int TriggerTimeSpan = 200;
 
         //-----------------------------
         //Public field
@@ -29,14 +29,14 @@ namespace ChangeSysTimeFrmApp
         /// </summary>
         public int ContinueTime
         {
-            get { return timerCount/(1000/TriggerTimeSpan); }
-            set { timerCount = value*(1000/TriggerTimeSpan); }
+            get { return timerCount / (1000 / TriggerTimeSpan); }
+            set { timerCount = value * (1000 / TriggerTimeSpan); }
         }
 
         /// <summary>
         /// 目标年份
         /// </summary>
-        public int TargetYear { get; set; }
+        public DateTime TargetDate { get; set; }
 
         /// <summary>
         /// 系统是否正在运行
@@ -83,10 +83,10 @@ namespace ChangeSysTimeFrmApp
 
         public ChangeDate()
         {
-            ContinueTime = 20;//默认20秒
-            TargetYear = 2008;//默认2008
+            ContinueTime = 200; // 默认200秒
+            TargetDate = DateTime.Now; // 默认
 
-            realDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            realDate = DateTime.Now;
             timer = new Timer(TriggerTimeSpan);
             timer.Elapsed += TimerOnElapsed;
         }
@@ -97,7 +97,7 @@ namespace ChangeSysTimeFrmApp
         /// <param name="second">时间，秒</param>
         public void AddContinueTime(int second)
         {
-            int count = second*(1000/TriggerTimeSpan);
+            int count = second * (1000 / TriggerTimeSpan);
             timerCount += count;
         }
 
@@ -106,7 +106,6 @@ namespace ChangeSysTimeFrmApp
         /// </summary>
         public void Run()
         {
-            targetDateTime = TargetYear + DateTime.Now.ToString("-MM-dd HH:mm:ss");
             timer.Start();
         }
 
@@ -116,7 +115,7 @@ namespace ChangeSysTimeFrmApp
         public void Stop()
         {
             timer.Stop();
-            realDateTime = realDate.Year + DateTime.Now.ToString("-MM-dd HH:mm:ss");
+            realDateTime = realDate.ToString("yyyy-MM-dd") + DateTime.Now.ToString(" HH:mm:ss");
             SysTimePro.SetLocalTimeByStr(realDateTime);
         }
 
@@ -125,15 +124,13 @@ namespace ChangeSysTimeFrmApp
 
         private void TimerOnElapsed(object sender, ElapsedEventArgs e)
         {
-            if (DateTime.Now.Year != TargetYear)
-            {
-                SysTimePro.SetLocalTimeByStr(targetDateTime);
-            }
+            targetDateTime = TargetDate.ToString("yyyy-MM-dd ") + DateTime.Now.ToString("HH:mm:ss");
+            SysTimePro.SetLocalTimeByStr(targetDateTime);
 
             if (--timerCount == 0)
             {
                 timer.Stop();
-                realDateTime = realDate.Year + DateTime.Now.ToString("-MM-dd HH:mm:ss");
+                realDateTime = realDate.ToString("yyyy-MM-dd") + DateTime.Now.ToString(" HH:mm:ss");
                 SysTimePro.SetLocalTimeByStr(realDateTime);
                 if (ChangeFinished != null)
                 {
@@ -151,6 +148,5 @@ namespace ChangeSysTimeFrmApp
                 }
             }
         }
-
     }
 }

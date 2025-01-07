@@ -14,7 +14,6 @@ namespace ChangeSysTimeFrmApp
     {
         private ChangeDate changeDateHandler;
 
-
         public MainForm()
         {
             InitializeComponent();
@@ -24,15 +23,14 @@ namespace ChangeSysTimeFrmApp
         private void MainForm_Load(object sender, EventArgs e)
         {
             // 界面显示初始化
-            nudYear.Value = 2008;
+            nudYear.Value = DateTime.Now.Year;
             nudMonth.Value = DateTime.Now.Month;
             nudDay.Value = DateTime.Now.Day;
-            nudMonth.Enabled = false;
-            nudDay.Enabled = false;
 
             EventHandler eh = (o, args) =>
             {
-                int timelength = (int) nudHour.Value*3600 + (int) nudMinute.Value*60 + (int) nudSecond.Value;
+                int timelength =
+                    (int)nudHour.Value * 3600 + (int)nudMinute.Value * 60 + (int)nudSecond.Value;
                 lbLeftTime.Text = timelength.ToString();
             };
 
@@ -45,20 +43,20 @@ namespace ChangeSysTimeFrmApp
             // 托盘菜单
             showMianFormMenuItem.Click += ShowMianFormMenuItemOnClick;
             exitMenuItem.Click += ExitMenuItemOnClick;
-            
+
             // 倒计时
             changeDateHandler.CountDown += time =>
             {
-                this.Invoke(new Action(() =>
-                {
-                    this.lbLeftTime.Text = time.ToString();
-                }));
+                this.Invoke(
+                    new Action(() =>
+                    {
+                        this.lbLeftTime.Text = time.ToString();
+                    })
+                );
             };
 
             btnAdd60Second.Enabled = false;
-
         }
-
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -77,9 +75,14 @@ namespace ChangeSysTimeFrmApp
 
         private void btnOk_Click(object sender, EventArgs e)
         {
-            int timelength = (int) nudHour.Value*3600 + (int) nudMinute.Value*60 + (int) nudSecond.Value;
+            int timelength =
+                (int)nudHour.Value * 3600 + (int)nudMinute.Value * 60 + (int)nudSecond.Value;
             changeDateHandler.ContinueTime = timelength;
-            changeDateHandler.TargetYear = (int) nudYear.Value;
+            changeDateHandler.TargetDate = new DateTime(
+                (int)nudYear.Value,
+                (int)nudMonth.Value,
+                (int)nudDay.Value
+            );
             changeDateHandler.Run();
             btnOk.Enabled = false;
             btnAdd60Second.Enabled = true;
@@ -96,7 +99,6 @@ namespace ChangeSysTimeFrmApp
         {
             HideMainForm();
         }
-
 
         private void ExitMenuItemOnClick(object sender, EventArgs eventArgs)
         {
@@ -146,11 +148,5 @@ namespace ChangeSysTimeFrmApp
         {
             changeDateHandler.AddContinueTime(60);
         }
-
-
-
-
-
-
     }
 }
